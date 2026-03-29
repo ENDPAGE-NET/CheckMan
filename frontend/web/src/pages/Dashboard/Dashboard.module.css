@@ -1,0 +1,25 @@
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+}
+
+.statCard {
+  text-align: left;
+}
+
+.statIcon {
+  font-size: 24px;
+  margin-bottom: 12px;
+}
+
+.statLabel {
+  font-family: 'Manrope', sans-serif;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: #8A918E;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-bottom: 4px;
+}

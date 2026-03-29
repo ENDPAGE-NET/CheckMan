@@ -1,0 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@700;800&family=Manrope:wght@400;500;600;700&display=swap');
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+body { background: #F8FAF8; }
+
+.page-title {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: 1.8rem;
+  color: #2D3432;
+  letter-spacing: -0.02em;
+}
+
+.stat-number {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: 2.5rem;
+  color: #2D3432;
+  letter-spacing: -0.03em;
+}
+
+@media (max-width: 767px) {
+  .page-title {
+    font-size: 1.4rem;
+  }
+
+  .stat-number {
+    font-size: 1.8rem;
+  }
+}

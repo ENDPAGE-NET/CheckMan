@@ -1,0 +1,25 @@
+version: "3.8"
+
+services:
+  backend:
+    build: ./backend
+    volumes:
+      - db_data:/app/checkman.db
+      - face_data:/app/face_data
+    expose:
+      - "8000"
+    restart: unless-stopped
+
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx/Dockerfile
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+volumes:
+  db_data:
+  face_data:

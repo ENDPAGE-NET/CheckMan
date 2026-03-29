@@ -1,0 +1,159 @@
+.layout {
+  min-height: 100vh;
+}
+
+.sider {
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(172, 179, 177, 0.1);
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: 1.3rem;
+  color: #2D3432;
+  padding: 20px 24px 16px;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.logoImg {
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.logoImgSmall {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.menu {
+  flex: 1;
+  border-inline-end: none !important;
+  background: transparent;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 56px;
+  line-height: 56px;
+  background: #fff;
+  border-bottom: 1px solid rgba(172, 179, 177, 0.1);
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.hamburger {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 18px;
+  color: #2D3432;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.hamburger:hover {
+  background: rgba(172, 179, 177, 0.08);
+}
+
+.headerBrand {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-weight: 800;
+  font-size: 1.2rem;
+  color: #2D3432;
+  letter-spacing: -0.02em;
+}
+
+.headerLogoImg {
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+.mobileNav {
+  background: #fff;
+  border-bottom: 1px solid rgba(172, 179, 177, 0.1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+.mobileMenu {
+  border-inline-end: none !important;
+  background: transparent;
+}
+
+.userArea {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 8px;
+  transition: background 0.2s;
+}
+
+.userArea:hover {
+  background: rgba(172, 179, 177, 0.08);
+}
+
+.userName {
+  font-size: 13px;
+  color: #59615F;
+}
+
+.avatar {
+  background: linear-gradient(135deg, #556257, #7a8a7c);
+  font-weight: 600;
+}
+
+.dropdownInfo {
+  padding: 4px 0;
+}
+
+.dropdownUsername {
+  font-weight: 600;
+  color: #2D3432;
+}
+
+.content {
+  padding: 32px;
+  background: #F8FAF8;
+  overflow-y: auto;
+}
+
+.contentTablet {
+  padding: 24px;
+}
+
+.contentMobile {
+  padding: 16px;
+}
+
+@media (max-width: 767px) {
+  .header {
+    padding: 0 16px;
+  }
+}
