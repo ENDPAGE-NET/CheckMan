@@ -1,0 +1,2045 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CheckMan - 企业弹性考勤管理系统</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* ===== DESIGN SYSTEM ===== */
+:root {
+  /* Color Palette - Warm Copper Industrial */
+  --bg-deepest: #0a0b10;
+  --bg-deep: #0f1119;
+  --bg-surface: #161826;
+  --bg-surface-hover: #1c1f33;
+  --bg-elevated: #1f2237;
+  --bg-card: #181b2c;
+
+  --copper-100: #fcecd8;
+  --copper-200: #f5d0a9;
+  --copper-300: #e8a96b;
+  --copper-400: #d4915c;
+  --copper-500: #c07a45;
+  --copper-600: #a66435;
+  --copper-glow: rgba(212, 145, 92, 0.15);
+  --copper-glow-strong: rgba(212, 145, 92, 0.3);
+
+  --text-primary: #e8e0d4;
+  --text-secondary: #9a9494;
+  --text-muted: #5c5959;
+  --text-accent: #d4915c;
+
+  --success: #6aab6a;
+  --success-bg: rgba(106, 171, 106, 0.12);
+  --warning: #d4a24c;
+  --warning-bg: rgba(212, 162, 76, 0.12);
+  --error: #c45c5c;
+  --error-bg: rgba(196, 92, 92, 0.12);
+  --info: #5c8ec4;
+  --info-bg: rgba(92, 142, 196, 0.12);
+
+  --border: rgba(255, 255, 255, 0.06);
+  --border-hover: rgba(212, 145, 92, 0.25);
+
+  /* Typography */
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Outfit', -apple-system, sans-serif;
+
+  /* Spacing */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
+  --space-2xl: 48px;
+  --space-3xl: 64px;
+
+  /* Radius */
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+
+  /* Shadows */
+  --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 24px rgba(0,0,0,0.4);
+  --shadow-lg: 0 8px 48px rgba(0,0,0,0.5);
+  --shadow-copper: 0 4px 24px rgba(212, 145, 92, 0.15);
+
+  /* Transitions */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --duration-fast: 0.15s;
+  --duration-normal: 0.3s;
+  --duration-slow: 0.6s;
+}
+
+/* ===== RESET & BASE ===== */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html { font-size: 16px; -webkit-font-smoothing: antialiased; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-deepest);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* Noise texture overlay */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+a { color: var(--copper-400); text-decoration: none; }
+button { cursor: pointer; font-family: var(--font-body); }
+input, select, textarea { font-family: var(--font-body); }
+
+/* ===== SCROLLBAR ===== */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--text-muted); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--copper-400); }
+
+/* ===== LOGIN PAGE ===== */
+.login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse 80% 60% at 20% 80%, rgba(212, 145, 92, 0.08), transparent),
+    radial-gradient(ellipse 60% 50% at 80% 20%, rgba(92, 142, 196, 0.05), transparent),
+    var(--bg-deepest);
+  position: relative;
+  overflow: hidden;
+}
+
+.login-page::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 100px,
+    rgba(212, 145, 92, 0.015) 100px,
+    rgba(212, 145, 92, 0.015) 101px
+  );
+  animation: gridSlide 20s linear infinite;
+}
+
+@keyframes gridSlide {
+  0% { transform: translate(0, 0); }
+  100% { transform: translate(141px, 0); }
+}
+
+.login-container {
+  position: relative;
+  z-index: 1;
+  width: 420px;
+  padding: var(--space-3xl) var(--space-2xl);
+}
+
+.login-brand {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.login-brand .brand-icon {
+  width: 72px;
+  height: 72px;
+  background: linear-gradient(135deg, var(--copper-400), var(--copper-600));
+  border-radius: var(--radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto var(--space-lg);
+  font-size: 32px;
+  color: white;
+  box-shadow: var(--shadow-copper);
+  position: relative;
+}
+
+.login-brand .brand-icon::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 20px;
+  border: 1px solid rgba(212, 145, 92, 0.2);
+}
+
+.login-brand h1 {
+  font-family: var(--font-display);
+  font-size: 2.8rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.login-brand p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 300;
+  margin-top: var(--space-sm);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.login-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+.form-field {
+  position: relative;
+}
+
+.form-field label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-sm);
+}
+
+.form-field input {
+  width: 100%;
+  padding: 14px 16px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.95rem;
+  transition: all var(--duration-normal) var(--ease-out);
+  outline: none;
+}
+
+.form-field input::placeholder {
+  color: var(--text-muted);
+}
+
+.form-field input:focus {
+  border-color: var(--copper-400);
+  box-shadow: 0 0 0 3px var(--copper-glow);
+  background: var(--bg-surface-hover);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  padding: 12px 24px;
+  border-radius: var(--radius-md);
+  font-size: 0.88rem;
+  font-weight: 500;
+  border: none;
+  transition: all var(--duration-normal) var(--ease-out);
+  position: relative;
+  overflow: hidden;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--copper-400), var(--copper-500));
+  color: white;
+  box-shadow: var(--shadow-copper);
+}
+
+.btn-primary:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 32px rgba(212, 145, 92, 0.3);
+}
+
+.btn-primary:active { transform: translateY(0); }
+
+.btn-login {
+  width: 100%;
+  padding: 16px;
+  font-size: 1rem;
+  margin-top: var(--space-sm);
+  letter-spacing: 0.04em;
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-secondary);
+  border: 1px solid var(--border);
+}
+
+.btn-ghost:hover {
+  border-color: var(--border-hover);
+  color: var(--text-primary);
+  background: var(--bg-surface);
+}
+
+.btn-sm { padding: 8px 14px; font-size: 0.8rem; }
+
+.btn-success { background: var(--success); color: white; }
+.btn-success:hover { background: #5d9b5d; }
+
+.btn-danger { background: var(--error); color: white; }
+.btn-danger:hover { background: #b04e4e; }
+
+/* ===== APP LAYOUT ===== */
+.app {
+  display: none;
+  min-height: 100vh;
+}
+
+.app.active { display: flex; }
+.login-page.active { display: flex; }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: 260px;
+  min-height: 100vh;
+  background: var(--bg-deep);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  z-index: 100;
+}
+
+.sidebar-brand {
+  padding: var(--space-lg) var(--space-lg);
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-brand .icon-box {
+  width: 38px;
+  height: 38px;
+  background: linear-gradient(135deg, var(--copper-400), var(--copper-600));
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.sidebar-brand .brand-text h2 {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 600;
+  line-height: 1.1;
+}
+
+.sidebar-brand .brand-text span {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: var(--space-md) var(--space-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-section-title {
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.15em;
+  padding: var(--space-md) var(--space-md) var(--space-sm);
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  font-weight: 400;
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+  position: relative;
+}
+
+.nav-item:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.nav-item.active {
+  background: var(--copper-glow);
+  color: var(--copper-300);
+}
+
+.nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 3px;
+  height: 20px;
+  background: var(--copper-400);
+  border-radius: 0 2px 2px 0;
+}
+
+.nav-item .nav-icon {
+  width: 20px;
+  text-align: center;
+  font-size: 1rem;
+  flex-shrink: 0;
+}
+
+.nav-item .badge {
+  margin-left: auto;
+  background: var(--error);
+  color: white;
+  font-size: 0.68rem;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 10px;
+  line-height: 1.3;
+}
+
+.sidebar-footer {
+  padding: var(--space-md);
+  border-top: 1px solid var(--border);
+}
+
+.user-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background var(--duration-fast) ease;
+}
+
+.user-card:hover { background: var(--bg-surface); }
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--copper-500), var(--copper-300));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.user-card .user-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.user-card .user-name {
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.user-card .user-role {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+}
+
+/* ===== MAIN CONTENT ===== */
+.main {
+  flex: 1;
+  margin-left: 260px;
+  min-height: 100vh;
+  background:
+    radial-gradient(ellipse 50% 40% at 90% 10%, rgba(212, 145, 92, 0.04), transparent),
+    var(--bg-deepest);
+}
+
+.page { display: none; padding: var(--space-2xl); }
+.page.active { display: block; }
+
+/* Page Header */
+.page-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: var(--space-xl);
+  padding-bottom: var(--space-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.page-header h1 {
+  font-family: var(--font-display);
+  font-size: 2.2rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.page-header .subtitle {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 300;
+  margin-top: 4px;
+}
+
+.page-header-actions {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+/* ===== STAT CARDS ===== */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  position: relative;
+  overflow: hidden;
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.stat-card:hover {
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.stat-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+}
+
+.stat-card:nth-child(1)::before { background: linear-gradient(90deg, var(--copper-400), transparent); }
+.stat-card:nth-child(2)::before { background: linear-gradient(90deg, var(--success), transparent); }
+.stat-card:nth-child(3)::before { background: linear-gradient(90deg, var(--warning), transparent); }
+.stat-card:nth-child(4)::before { background: linear-gradient(90deg, var(--info), transparent); }
+
+.stat-card .stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  margin-bottom: var(--space-md);
+}
+
+.stat-card:nth-child(1) .stat-icon { background: var(--copper-glow); }
+.stat-card:nth-child(2) .stat-icon { background: var(--success-bg); }
+.stat-card:nth-child(3) .stat-icon { background: var(--warning-bg); }
+.stat-card:nth-child(4) .stat-icon { background: var(--info-bg); }
+
+.stat-card .stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+
+.stat-card .stat-label {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.stat-card .stat-trend {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  margin-top: var(--space-sm);
+  padding: 3px 8px;
+  border-radius: 20px;
+}
+
+.stat-trend.up { color: var(--success); background: var(--success-bg); }
+.stat-trend.down { color: var(--error); background: var(--error-bg); }
+
+/* ===== CONTENT PANELS ===== */
+.content-grid {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: var(--space-lg);
+}
+
+.panel {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-lg) var(--space-lg) var(--space-md);
+}
+
+.panel-header h3 {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.panel-body { padding: 0 var(--space-lg) var(--space-lg); }
+
+/* ===== TABLE ===== */
+.table-wrapper { overflow-x: auto; }
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+table th {
+  text-align: left;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  padding: var(--space-sm) var(--space-md);
+  border-bottom: 1px solid var(--border);
+}
+
+table td {
+  padding: 12px var(--space-md);
+  font-size: 0.88rem;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-secondary);
+}
+
+table tbody tr {
+  transition: background var(--duration-fast) ease;
+}
+
+table tbody tr:hover {
+  background: var(--bg-surface);
+}
+
+table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.td-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.td-name .avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: white;
+  flex-shrink: 0;
+}
+
+.td-name .name-text { color: var(--text-primary); font-weight: 500; }
+.td-name .username { font-size: 0.75rem; color: var(--text-muted); }
+
+/* Status badges */
+.status {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 0.72rem;
+  font-weight: 500;
+}
+
+.status-active { color: var(--success); background: var(--success-bg); }
+.status-pending { color: var(--warning); background: var(--warning-bg); }
+.status-rejected { color: var(--error); background: var(--error-bg); }
+
+.status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ===== FILTER BAR ===== */
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.filter-bar .search-box {
+  position: relative;
+  flex: 1;
+  min-width: 220px;
+}
+
+.filter-bar .search-box input {
+  width: 100%;
+  padding: 10px 14px 10px 38px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.85rem;
+  outline: none;
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.filter-bar .search-box input:focus {
+  border-color: var(--copper-400);
+  box-shadow: 0 0 0 3px var(--copper-glow);
+}
+
+.filter-bar .search-box::before {
+  content: '⌕';
+  position: absolute;
+  left: 13px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
+.filter-chip {
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+}
+
+.filter-chip:hover { border-color: var(--border-hover); color: var(--text-primary); }
+.filter-chip.active {
+  background: var(--copper-glow);
+  border-color: var(--copper-400);
+  color: var(--copper-300);
+}
+
+/* ===== TIMELINE (Dashboard) ===== */
+.timeline { display: flex; flex-direction: column; gap: 0; }
+
+.timeline-item {
+  display: flex;
+  gap: 14px;
+  padding: 12px 0;
+  position: relative;
+}
+
+.timeline-item:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 40px;
+  bottom: -2px;
+  width: 1px;
+  background: var(--border);
+}
+
+.timeline-dot {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  flex-shrink: 0;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+}
+
+.timeline-dot.checkin { background: var(--success-bg); border-color: rgba(106, 171, 106, 0.3); }
+.timeline-dot.checkout { background: var(--info-bg); border-color: rgba(92, 142, 196, 0.3); }
+.timeline-dot.pending { background: var(--warning-bg); border-color: rgba(212, 162, 76, 0.3); }
+
+.timeline-content .timeline-title {
+  font-size: 0.85rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.timeline-content .timeline-time {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+/* ===== POLICY CARDS ===== */
+.policy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: var(--space-md);
+}
+
+.policy-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.policy-card:hover {
+  border-color: var(--border-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.policy-card .policy-name {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.policy-card .policy-rules {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-sm);
+  margin-bottom: var(--space-md);
+}
+
+.policy-rule {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+}
+
+.policy-rule .rule-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+}
+
+.rule-enabled .rule-icon { background: var(--success-bg); }
+.rule-disabled .rule-icon { background: var(--bg-surface); }
+.rule-enabled .rule-text { color: var(--text-primary); }
+.rule-disabled .rule-text { color: var(--text-muted); text-decoration: line-through; }
+
+.policy-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-md);
+  border-top: 1px solid var(--border);
+}
+
+.policy-meta .employee-count {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.policy-actions {
+  display: flex;
+  gap: var(--space-xs);
+}
+
+/* ===== RECORDS PAGE ===== */
+.records-filters {
+  display: flex;
+  align-items: center;
+  gap: var(--space-md);
+  margin-bottom: var(--space-lg);
+  flex-wrap: wrap;
+}
+
+.records-filters .date-range {
+  display: flex;
+  align-items: center;
+  gap: var(--space-sm);
+}
+
+.records-filters input[type="date"] {
+  padding: 8px 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-size: 0.82rem;
+  outline: none;
+}
+
+.records-filters input[type="date"]:focus {
+  border-color: var(--copper-400);
+}
+
+.check-type {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.check-type.clock-in {
+  color: var(--success);
+  background: var(--success-bg);
+}
+
+.check-type.clock-out {
+  color: var(--info);
+  background: var(--info-bg);
+}
+
+.verify-status {
+  font-size: 0.78rem;
+}
+
+.verify-pass { color: var(--success); }
+.verify-fail { color: var(--error); }
+.verify-na { color: var(--text-muted); }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all var(--duration-normal) var(--ease-out);
+}
+
+.modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modal {
+  background: var(--bg-elevated);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(20px) scale(0.98);
+  transition: transform var(--duration-normal) var(--ease-spring);
+}
+
+.modal-overlay.active .modal {
+  transform: translateY(0) scale(1);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-lg);
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h3 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  font-weight: 600;
+}
+
+.modal-close {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--duration-fast) ease;
+}
+
+.modal-close:hover {
+  background: var(--bg-surface);
+  color: var(--text-primary);
+}
+
+.modal-body { padding: var(--space-lg); }
+
+.modal-body .form-field { margin-bottom: var(--space-md); }
+
+.modal-body .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--space-md);
+}
+
+.form-field select {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.toggle-field {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.toggle-field:last-child { border-bottom: none; }
+
+.toggle-label .toggle-title {
+  font-size: 0.88rem;
+  color: var(--text-primary);
+  font-weight: 500;
+}
+
+.toggle-label .toggle-desc {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.toggle-switch {
+  width: 44px;
+  height: 24px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  position: relative;
+  cursor: pointer;
+  transition: all var(--duration-fast) ease;
+  flex-shrink: 0;
+}
+
+.toggle-switch::after {
+  content: '';
+  width: 18px;
+  height: 18px;
+  background: var(--text-muted);
+  border-radius: 50%;
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  transition: all var(--duration-normal) var(--ease-spring);
+}
+
+.toggle-switch.active {
+  background: var(--copper-400);
+  border-color: var(--copper-500);
+}
+
+.toggle-switch.active::after {
+  transform: translateX(20px);
+  background: white;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--space-sm);
+  padding: var(--space-md) var(--space-lg) var(--space-lg);
+}
+
+/* ===== PAGINATION ===== */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: var(--space-lg);
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.pagination .page-info { color: var(--text-muted); }
+
+.pagination-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.pagination-btns button {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+  transition: all var(--duration-fast) ease;
+}
+
+.pagination-btns button:hover { border-color: var(--border-hover); color: var(--text-primary); }
+.pagination-btns button.active { background: var(--copper-glow); border-color: var(--copper-400); color: var(--copper-300); }
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.anim-stagger > * {
+  animation: fadeInUp 0.5s var(--ease-out) both;
+}
+.anim-stagger > *:nth-child(1) { animation-delay: 0.05s; }
+.anim-stagger > *:nth-child(2) { animation-delay: 0.1s; }
+.anim-stagger > *:nth-child(3) { animation-delay: 0.15s; }
+.anim-stagger > *:nth-child(4) { animation-delay: 0.2s; }
+.anim-stagger > *:nth-child(5) { animation-delay: 0.25s; }
+.anim-stagger > *:nth-child(6) { animation-delay: 0.3s; }
+.anim-stagger > *:nth-child(7) { animation-delay: 0.35s; }
+.anim-stagger > *:nth-child(8) { animation-delay: 0.4s; }
+
+.page.active .stats-grid { animation: fadeIn 0.4s var(--ease-out); }
+.page.active .panel { animation: fadeInUp 0.5s var(--ease-out) 0.1s both; }
+
+/* ===== CHART PLACEHOLDER ===== */
+.chart-area {
+  height: 200px;
+  background:
+    linear-gradient(180deg, var(--copper-glow) 0%, transparent 100%);
+  border-radius: var(--radius-sm);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  padding: 0 var(--space-sm) var(--space-sm);
+}
+
+.chart-bar {
+  flex: 1;
+  background: linear-gradient(180deg, var(--copper-400), var(--copper-600));
+  border-radius: 3px 3px 0 0;
+  min-height: 8px;
+  opacity: 0.7;
+  transition: opacity var(--duration-fast) ease;
+}
+
+.chart-bar:hover { opacity: 1; }
+
+/* ===== EMPTY STATE ===== */
+.empty-state {
+  text-align: center;
+  padding: var(--space-3xl) var(--space-xl);
+  color: var(--text-muted);
+}
+
+.empty-state .empty-icon {
+  font-size: 3rem;
+  margin-bottom: var(--space-md);
+  opacity: 0.5;
+}
+
+.empty-state p {
+  font-size: 0.9rem;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .content-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; }
+  .stats-grid { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ===== LOGIN PAGE ===== -->
+<div class="login-page active" id="loginPage">
+  <div class="login-container">
+    <div class="login-brand">
+      <div class="brand-icon">&#10003;</div>
+      <h1>CheckMan</h1>
+      <p>Enterprise Attendance System</p>
+    </div>
+    <form class="login-form" onsubmit="handleLogin(event)">
+      <div class="form-field">
+        <label>用户名</label>
+        <input type="text" placeholder="请输入管理员账号" value="admin" autocomplete="username">
+      </div>
+      <div class="form-field">
+        <label>密码</label>
+        <input type="password" placeholder="请输入密码" value="admin123" autocomplete="current-password">
+      </div>
+      <button type="submit" class="btn btn-primary btn-login">登录管理后台</button>
+    </form>
+  </div>
+</div>
+
+<!-- ===== APP SHELL ===== -->
+<div class="app" id="appShell">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-brand">
+      <div class="icon-box">&#10003;</div>
+      <div class="brand-text">
+        <h2>CheckMan</h2>
+        <span>考勤管理系统</span>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-title">概览</div>
+      <div class="nav-item active" data-page="dashboard">
+        <span class="nav-icon">&#9632;</span>
+        <span>仪表盘</span>
+      </div>
+      <div class="nav-section-title">管理</div>
+      <div class="nav-item" data-page="employees">
+        <span class="nav-icon">&#9673;</span>
+        <span>员工管理</span>
+        <span class="badge">3</span>
+      </div>
+      <div class="nav-item" data-page="policies">
+        <span class="nav-icon">&#9881;</span>
+        <span>打卡策略</span>
+      </div>
+      <div class="nav-item" data-page="records">
+        <span class="nav-icon">&#9776;</span>
+        <span>考勤记录</span>
+      </div>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="user-card" onclick="handleLogout()">
+        <div class="user-avatar">A</div>
+        <div class="user-info">
+          <div class="user-name">管理员</div>
+          <div class="user-role">Super Admin</div>
+        </div>
+        <span style="color: var(--text-muted); font-size: 0.75rem;">&#10132;</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- ===== DASHBOARD ===== -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <div>
+          <h1>仪表盘</h1>
+          <p class="subtitle">欢迎回来，这是今日考勤概览</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-ghost btn-sm">&#8635; 刷新数据</button>
+        </div>
+      </div>
+
+      <div class="stats-grid anim-stagger">
+        <div class="stat-card">
+          <div class="stat-icon">&#9673;</div>
+          <div class="stat-value">128</div>
+          <div class="stat-label">在职员工总数</div>
+          <div class="stat-trend up">&#9650; +5 本月新增</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">&#10003;</div>
+          <div class="stat-value">96</div>
+          <div class="stat-label">今日已签到</div>
+          <div class="stat-trend up">75% 签到率</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">&#9888;</div>
+          <div class="stat-value">3</div>
+          <div class="stat-label">待审核注册</div>
+          <div class="stat-trend down">需要处理</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">&#128205;</div>
+          <div class="stat-value">4</div>
+          <div class="stat-label">活跃策略</div>
+          <div class="stat-trend up">运行正常</div>
+        </div>
+      </div>
+
+      <div class="content-grid">
+        <div class="panel">
+          <div class="panel-header">
+            <h3>本周签到趋势</h3>
+            <span style="font-size: 0.78rem; color: var(--text-muted);">2026年3月23日 - 29日</span>
+          </div>
+          <div class="panel-body">
+            <div class="chart-area">
+              <div class="chart-bar" style="height: 65%"></div>
+              <div class="chart-bar" style="height: 78%"></div>
+              <div class="chart-bar" style="height: 82%"></div>
+              <div class="chart-bar" style="height: 71%"></div>
+              <div class="chart-bar" style="height: 90%"></div>
+              <div class="chart-bar" style="height: 45%"></div>
+              <div class="chart-bar" style="height: 30%"></div>
+              <div class="chart-bar" style="height: 68%"></div>
+              <div class="chart-bar" style="height: 85%"></div>
+              <div class="chart-bar" style="height: 72%"></div>
+              <div class="chart-bar" style="height: 88%"></div>
+              <div class="chart-bar" style="height: 75%"></div>
+              <div class="chart-bar" style="height: 92%"></div>
+              <div class="chart-bar" style="height: 60%"></div>
+              <div class="chart-bar" style="height: 55%"></div>
+              <div class="chart-bar" style="height: 70%"></div>
+              <div class="chart-bar" style="height: 80%"></div>
+              <div class="chart-bar" style="height: 95%"></div>
+              <div class="chart-bar" style="height: 42%"></div>
+              <div class="chart-bar" style="height: 35%"></div>
+            </div>
+            <div style="display: flex; justify-content: space-between; padding-top: 8px; font-size: 0.7rem; color: var(--text-muted);">
+              <span>周一</span><span>周二</span><span>周三</span><span>周四</span><span>周五</span><span>周六</span><span>周日</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <h3>最近动态</h3>
+            <button class="btn btn-ghost btn-sm">查看全部</button>
+          </div>
+          <div class="panel-body">
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-dot checkin">&#10003;</div>
+                <div class="timeline-content">
+                  <div class="timeline-title">张三 签到成功</div>
+                  <div class="timeline-time">09:02 · 人脸通过 · 地点通过</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot checkout">&#10132;</div>
+                <div class="timeline-content">
+                  <div class="timeline-title">李四 签退成功</div>
+                  <div class="timeline-time">18:15 · 人脸通过</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot pending">&#9888;</div>
+                <div class="timeline-content">
+                  <div class="timeline-title">新员工注册待审核</div>
+                  <div class="timeline-time">王五 · 10分钟前</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot checkin">&#10003;</div>
+                <div class="timeline-content">
+                  <div class="timeline-title">赵六 签到成功</div>
+                  <div class="timeline-time">08:55 · 人脸通过 · 地点通过</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-dot checkout">&#10132;</div>
+                <div class="timeline-content">
+                  <div class="timeline-title">孙七 签退成功</div>
+                  <div class="timeline-time">17:58 · 人脸通过</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== EMPLOYEES PAGE ===== -->
+    <div class="page" id="page-employees">
+      <div class="page-header">
+        <div>
+          <h1>员工管理</h1>
+          <p class="subtitle">管理员工账户、审批注册请求</p>
+        </div>
+      </div>
+
+      <div class="filter-bar">
+        <div class="search-box">
+          <input type="text" placeholder="搜索员工姓名或用户名...">
+        </div>
+        <button class="filter-chip active">全部 (128)</button>
+        <button class="filter-chip">活跃 (120)</button>
+        <button class="filter-chip">待审核 (3)</button>
+        <button class="filter-chip">已拒绝 (5)</button>
+      </div>
+
+      <div class="panel">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>员工信息</th>
+                <th>状态</th>
+                <th>打卡策略</th>
+                <th>人脸录入</th>
+                <th>注册时间</th>
+                <th>操作</th>
+              </tr>
+            </thead>
+            <tbody class="anim-stagger">
+              <tr>
+                <td>
+                  <div class="td-name">
+                    <div class="avatar" style="background: linear-gradient(135deg, #d4915c, #a66435)">张</div>
+                    <div>
+                      <div class="name-text">张三</div>
+                      <div class="username">zhangsan</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="status status-active">活跃</span></td>
+                <td style="color: var(--text-primary);">办公室考勤</td>
+                <td><span class="verify-pass">&#10003; 已录入</span></td>
+                <td>2026-02-15</td>
+                <td>
+                  <div style="display:flex; gap:4px;">
+                    <button class="btn btn-ghost btn-sm" onclick="showEditModal()">编辑</button>
+                    <button class="btn btn-ghost btn-sm">重置</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="td-name">
+                    <div class="avatar" style="background: linear-gradient(135deg, #5c8ec4, #3a6ea5)">李</div>
+                    <div>
+                      <div class="name-text">李四</div>
+                      <div class="username">lisi</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="status status-active">活跃</span></td>
+                <td style="color: var(--text-primary);">远程办公</td>
+                <td><span class="verify-pass">&#10003; 已录入</span></td>
+                <td>2026-01-20</td>
+                <td>
+                  <div style="display:flex; gap:4px;">
+                    <button class="btn btn-ghost btn-sm" onclick="showEditModal()">编辑</button>
+                    <button class="btn btn-ghost btn-sm">重置</button>
+                  </div>
+                </td>
+              </tr>
+              <tr style="background: var(--warning-bg);">
+                <td>
+                  <div class="td-name">
+                    <div class="avatar" style="background: linear-gradient(135deg, #d4a24c, #b8862a)">王</div>
+                    <div>
+                      <div class="name-text">王五</div>
+                      <div class="username">wangwu</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="status status-pending">待审核</span></td>
+                <td style="color: var(--text-muted);">—</td>
+                <td><span class="verify-pass">&#10003; 已录入</span></td>
+                <td>2026-03-29</td>
+                <td>
+                  <div style="display:flex; gap:4px;">
+                    <button class="btn btn-success btn-sm">&#10003; 通过</button>
+                    <button class="btn btn-danger btn-sm">&#10005; 拒绝</button>
+                  </div>
+                </td>
+              </tr>
+              <tr style="background: var(--warning-bg);">
+                <td>
+                  <div class="td-name">
+                    <div class="avatar" style="background: linear-gradient(135deg, #6aab6a, #4d8b4d)">赵</div>
+                    <div>
+                      <div class="name-text">赵六</div>
+                      <div class="username">zhaoliu</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="status status-pending">待审核</span></td>
+                <td style="color: var(--text-muted);">—</td>
+                <td><span class="verify-pass">&#10003; 已录入</span></td>
+                <td>2026-03-28</td>
+                <td>
+                  <div style="display:flex; gap:4px;">
+                    <button class="btn btn-success btn-sm">&#10003; 通过</button>
+                    <button class="btn btn-danger btn-sm">&#10005; 拒绝</button>
+                  </div>
+                </td>
+              </tr>
+              <tr style="background: var(--warning-bg);">
+                <td>
+                  <div class="td-name">
+                    <div class="avatar" style="background: linear-gradient(135deg, #c45c5c, #a34040)">孙</div>
+                    <div>
+                      <div class="name-text">孙七</div>
+                      <div class="username">sunqi</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="status status-pending">待审核</span></td>
+                <td style="color: var(--text-muted);">—</td>
+                <td><span class="verify-fail">&#10005; 未录入</span></td>
+                <td>2026-03-29</td>
+                <td>
+                  <div style="display:flex; gap:4px;">
+                    <button class="btn btn-success btn-sm">&#10003; 通过</button>
+                    <button class="btn btn-danger btn-sm">&#10005; 拒绝</button>
+                  </div>
+                </td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="td-name">
+                    <div class="avatar" style="background: linear-gradient(135deg, #9b6ab6, #7a4e97)">周</div>
+                    <div>
+                      <div class="name-text">周八</div>
+                      <div class="username">zhouba</div>
+                    </div>
+                  </div>
+                </td>
+                <td><span class="status status-rejected">已拒绝</span></td>
+                <td style="color: var(--text-muted);">—</td>
+                <td><span class="verify-pass">&#10003; 已录入</span></td>
+                <td>2026-03-20</td>
+                <td>
+                  <div style="display:flex; gap:4px;">
+                    <button class="btn btn-ghost btn-sm" disabled style="opacity:0.4">已处理</button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination" style="padding: var(--space-md) var(--space-lg) var(--space-lg);">
+          <span class="page-info">显示 1-6 / 共 128 条</span>
+          <div class="pagination-btns">
+            <button>&#8249;</button>
+            <button class="active">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>...</button>
+            <button>22</button>
+            <button>&#8250;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== POLICIES PAGE ===== -->
+    <div class="page" id="page-policies">
+      <div class="page-header">
+        <div>
+          <h1>打卡策略</h1>
+          <p class="subtitle">配置考勤规则，管理人脸识别与地点校验</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-primary btn-sm" onclick="showPolicyModal()">+ 新建策略</button>
+        </div>
+      </div>
+
+      <div class="policy-grid anim-stagger">
+        <div class="policy-card">
+          <div class="policy-name">
+            <span>办公室考勤</span>
+            <span style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-body);">默认</span>
+          </div>
+          <div class="policy-rules">
+            <div class="policy-rule rule-enabled">
+              <div class="rule-icon">&#128100;</div>
+              <span class="rule-text">人脸识别验证</span>
+            </div>
+            <div class="policy-rule rule-enabled">
+              <div class="rule-icon">&#128205;</div>
+              <span class="rule-text">地点范围校验</span>
+            </div>
+            <div class="policy-rule" style="font-size: 0.78rem; color: var(--text-muted); padding-left: 38px;">
+              坐标: 31.2304°N, 121.4737°E · 半径: 200m
+            </div>
+          </div>
+          <div class="policy-meta">
+            <span class="employee-count">&#9673; 86 名员工使用</span>
+            <div class="policy-actions">
+              <button class="btn btn-ghost btn-sm">编辑</button>
+              <button class="btn btn-ghost btn-sm" style="color: var(--error);">删除</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="policy-card">
+          <div class="policy-name">远程办公</div>
+          <div class="policy-rules">
+            <div class="policy-rule rule-enabled">
+              <div class="rule-icon">&#128100;</div>
+              <span class="rule-text">人脸识别验证</span>
+            </div>
+            <div class="policy-rule rule-disabled">
+              <div class="rule-icon">&#128205;</div>
+              <span class="rule-text">地点范围校验</span>
+            </div>
+          </div>
+          <div class="policy-meta">
+            <span class="employee-count">&#9673; 28 名员工使用</span>
+            <div class="policy-actions">
+              <button class="btn btn-ghost btn-sm">编辑</button>
+              <button class="btn btn-ghost btn-sm" style="color: var(--error);">删除</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="policy-card">
+          <div class="policy-name">仓库考勤</div>
+          <div class="policy-rules">
+            <div class="policy-rule rule-enabled">
+              <div class="rule-icon">&#128100;</div>
+              <span class="rule-text">人脸识别验证</span>
+            </div>
+            <div class="policy-rule rule-enabled">
+              <div class="rule-icon">&#128205;</div>
+              <span class="rule-text">地点范围校验</span>
+            </div>
+            <div class="policy-rule" style="font-size: 0.78rem; color: var(--text-muted); padding-left: 38px;">
+              坐标: 31.1894°N, 121.3862°E · 半径: 500m
+            </div>
+          </div>
+          <div class="policy-meta">
+            <span class="employee-count">&#9673; 12 名员工使用</span>
+            <div class="policy-actions">
+              <button class="btn btn-ghost btn-sm">编辑</button>
+              <button class="btn btn-ghost btn-sm" style="color: var(--error);">删除</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="policy-card">
+          <div class="policy-name">自由打卡</div>
+          <div class="policy-rules">
+            <div class="policy-rule rule-disabled">
+              <div class="rule-icon">&#128100;</div>
+              <span class="rule-text">人脸识别验证</span>
+            </div>
+            <div class="policy-rule rule-disabled">
+              <div class="rule-icon">&#128205;</div>
+              <span class="rule-text">地点范围校验</span>
+            </div>
+          </div>
+          <div class="policy-meta">
+            <span class="employee-count">&#9673; 2 名员工使用</span>
+            <div class="policy-actions">
+              <button class="btn btn-ghost btn-sm">编辑</button>
+              <button class="btn btn-ghost btn-sm" style="color: var(--error);">删除</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== RECORDS PAGE ===== -->
+    <div class="page" id="page-records">
+      <div class="page-header">
+        <div>
+          <h1>考勤记录</h1>
+          <p class="subtitle">查看所有员工打卡明细与验证结果</p>
+        </div>
+        <div class="page-header-actions">
+          <button class="btn btn-ghost btn-sm">&#8681; 导出 CSV</button>
+        </div>
+      </div>
+
+      <div class="records-filters">
+        <div class="search-box" style="flex: 0 0 220px;">
+          <input type="text" placeholder="搜索员工..." style="padding: 10px 14px 10px 38px; background: var(--bg-surface); border: 1px solid var(--border); border-radius: var(--radius-md); color: var(--text-primary); font-size: 0.85rem; width: 100%; outline: none;">
+        </div>
+        <div class="date-range">
+          <input type="date" value="2026-03-01">
+          <span style="color: var(--text-muted);">至</span>
+          <input type="date" value="2026-03-29">
+        </div>
+        <button class="filter-chip active">全部</button>
+        <button class="filter-chip">签到</button>
+        <button class="filter-chip">签退</button>
+      </div>
+
+      <div class="panel">
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>员工</th>
+                <th>打卡类型</th>
+                <th>打卡时间</th>
+                <th>人脸验证</th>
+                <th>地点验证</th>
+                <th>GPS 坐标</th>
+              </tr>
+            </thead>
+            <tbody class="anim-stagger">
+              <tr>
+                <td>
+                  <div class="td-name">
+                    <div class="avatar" style="background: linear-gradient(135deg, #d4915c, #a66435)">张</div>
+                    <div><div class="name-text">张三</div></div>
+                  </div>
+                </td>
+                <td><span class="check-type clock-in">&#9654; 签到</span></td>
+                <td>2026-03-29 09:02:15</td>
+                <td><span class="verify-pass">&#10003; 通过</span></td>
+                <td><span class="verify-pass">&#10003; 通过</span></td>
+                <td style="font-family: monospace; font-size: 0.75rem; color: var(--text-muted);">31.2308, 121.4741</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="td-name">
+                    <div class="avatar" style="background: linear-gradient(135deg, #5c8ec4, #3a6ea5)">李</div>
+                    <div><div class="name-text">李四</div></div>
+                  </div>
+                </td>
+                <td><span class="check-type clock-in">&#9654; 签到</span></td>
+                <td>2026-03-29 08:55:42</td>
+                <td><span class="verify-pass">&#10003; 通过</span></td>
+                <td><span class="verify-na">— 不要求</span></td>
+                <td style="font-family: monospace; font-size: 0.75rem; color: var(--text-muted);">—</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="td-name">
+                    <div class="avatar" style="background: linear-gradient(135deg, #6aab6a, #4d8b4d)">赵</div>
+                    <div><div class="name-text">赵六</div></div>
+                  </div>
+                </td>
+                <td><span class="check-type clock-out">&#9632; 签退</span></td>
+                <td>2026-03-28 18:15:30</td>
+                <td><span class="verify-pass">&#10003; 通过</span></td>
+                <td><span class="verify-pass">&#10003; 通过</span></td>
+                <td style="font-family: monospace; font-size: 0.75rem; color: var(--text-muted);">31.2301, 121.4735</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="td-name">
+                    <div class="avatar" style="background: linear-gradient(135deg, #d4915c, #a66435)">张</div>
+                    <div><div class="name-text">张三</div></div>
+                  </div>
+                </td>
+                <td><span class="check-type clock-out">&#9632; 签退</span></td>
+                <td>2026-03-28 18:02:08</td>
+                <td><span class="verify-pass">&#10003; 通过</span></td>
+                <td><span class="verify-fail">&#10005; 超出范围</span></td>
+                <td style="font-family: monospace; font-size: 0.75rem; color: var(--error);">31.2450, 121.5012</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="td-name">
+                    <div class="avatar" style="background: linear-gradient(135deg, #5c8ec4, #3a6ea5)">李</div>
+                    <div><div class="name-text">李四</div></div>
+                  </div>
+                </td>
+                <td><span class="check-type clock-out">&#9632; 签退</span></td>
+                <td>2026-03-28 17:58:22</td>
+                <td><span class="verify-pass">&#10003; 通过</span></td>
+                <td><span class="verify-na">— 不要求</span></td>
+                <td style="font-family: monospace; font-size: 0.75rem; color: var(--text-muted);">—</td>
+              </tr>
+              <tr>
+                <td>
+                  <div class="td-name">
+                    <div class="avatar" style="background: linear-gradient(135deg, #9b6ab6, #7a4e97)">周</div>
+                    <div><div class="name-text">周八</div></div>
+                  </div>
+                </td>
+                <td><span class="check-type clock-in">&#9654; 签到</span></td>
+                <td>2026-03-28 09:12:55</td>
+                <td><span class="verify-fail">&#10005; 不匹配</span></td>
+                <td><span class="verify-pass">&#10003; 通过</span></td>
+                <td style="font-family: monospace; font-size: 0.75rem; color: var(--text-muted);">31.2306, 121.4738</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination" style="padding: var(--space-md) var(--space-lg) var(--space-lg);">
+          <span class="page-info">显示 1-6 / 共 1,024 条</span>
+          <div class="pagination-btns">
+            <button>&#8249;</button>
+            <button class="active">1</button>
+            <button>2</button>
+            <button>3</button>
+            <button>...</button>
+            <button>171</button>
+            <button>&#8250;</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- ===== EDIT EMPLOYEE MODAL ===== -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>编辑员工信息</h3>
+      <button class="modal-close" onclick="closeModal('editModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-row">
+        <div class="form-field">
+          <label>姓名</label>
+          <input type="text" value="张三">
+        </div>
+        <div class="form-field">
+          <label>用户名</label>
+          <input type="text" value="zhangsan" disabled style="opacity: 0.5;">
+        </div>
+      </div>
+      <div class="form-field">
+        <label>打卡策略</label>
+        <select>
+          <option value="1" selected>办公室考勤</option>
+          <option value="2">远程办公</option>
+          <option value="3">仓库考勤</option>
+          <option value="4">自由打卡</option>
+        </select>
+      </div>
+      <div style="margin-top: var(--space-md);">
+        <label style="display: block; font-size: 0.75rem; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: var(--space-md);">个人覆盖设置</label>
+        <div class="toggle-field">
+          <div class="toggle-label">
+            <div class="toggle-title">覆盖人脸验证</div>
+            <div class="toggle-desc">启用后将忽略策略的人脸设置</div>
+          </div>
+          <div class="toggle-switch" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <div class="toggle-field">
+          <div class="toggle-label">
+            <div class="toggle-title">覆盖地点验证</div>
+            <div class="toggle-desc">启用后将忽略策略的地点设置</div>
+          </div>
+          <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+        </div>
+      </div>
+      <div class="form-row" style="margin-top: var(--space-md);">
+        <div class="form-field">
+          <label>覆盖纬度</label>
+          <input type="text" placeholder="31.2304" value="31.2310">
+        </div>
+        <div class="form-field">
+          <label>覆盖经度</label>
+          <input type="text" placeholder="121.4737" value="121.4745">
+        </div>
+      </div>
+      <div class="form-field">
+        <label>覆盖半径 (米)</label>
+        <input type="text" placeholder="200" value="300">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('editModal')">取消</button>
+      <button class="btn btn-primary" onclick="closeModal('editModal')">保存更改</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CREATE POLICY MODAL ===== -->
+<div class="modal-overlay" id="policyModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h3>新建打卡策略</h3>
+      <button class="modal-close" onclick="closeModal('policyModal')">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-field">
+        <label>策略名称</label>
+        <input type="text" placeholder="如：总部考勤">
+      </div>
+      <div style="margin-top: var(--space-md);">
+        <label style="display: block; font-size: 0.75rem; font-weight: 500; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: var(--space-md);">验证规则</label>
+        <div class="toggle-field">
+          <div class="toggle-label">
+            <div class="toggle-title">要求人脸识别</div>
+            <div class="toggle-desc">员工打卡时需进行人脸比对</div>
+          </div>
+          <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+        </div>
+        <div class="toggle-field">
+          <div class="toggle-label">
+            <div class="toggle-title">要求地点校验</div>
+            <div class="toggle-desc">员工打卡时需在指定范围内</div>
+          </div>
+          <div class="toggle-switch active" onclick="this.classList.toggle('active')"></div>
+        </div>
+      </div>
+      <div class="form-row" style="margin-top: var(--space-md);">
+        <div class="form-field">
+          <label>打卡纬度</label>
+          <input type="text" placeholder="31.2304">
+        </div>
+        <div class="form-field">
+          <label>打卡经度</label>
+          <input type="text" placeholder="121.4737">
+        </div>
+      </div>
+      <div class="form-field">
+        <label>允许半径 (米)</label>
+        <input type="text" placeholder="200">
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="closeModal('policyModal')">取消</button>
+      <button class="btn btn-primary">创建策略</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Navigation
+document.querySelectorAll('.nav-item').forEach(item => {
+  item.addEventListener('click', () => {
+    // Update active nav
+    document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+    item.classList.add('active');
+
+    // Show corresponding page
+    const page = item.dataset.page;
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById('page-' + page).classList.add('active');
+  });
+});
+
+// Login
+function handleLogin(e) {
+  e.preventDefault();
+  const loginPage = document.getElementById('loginPage');
+  const appShell = document.getElementById('appShell');
+
+  loginPage.style.opacity = '0';
+  loginPage.style.transform = 'scale(1.02)';
+  loginPage.style.transition = 'all 0.4s cubic-bezier(0.16, 1, 0.3, 1)';
+
+  setTimeout(() => {
+    loginPage.classList.remove('active');
+    loginPage.style.display = 'none';
+    appShell.classList.add('active');
+    appShell.style.animation = 'fadeIn 0.5s ease';
+  }, 350);
+}
+
+// Logout
+function handleLogout() {
+  const loginPage = document.getElementById('loginPage');
+  const appShell = document.getElementById('appShell');
+
+  appShell.classList.remove('active');
+  loginPage.classList.add('active');
+  loginPage.style.display = 'flex';
+  loginPage.style.opacity = '1';
+  loginPage.style.transform = 'scale(1)';
+}
+
+// Modals
+function showEditModal() {
+  document.getElementById('editModal').classList.add('active');
+}
+
+function showPolicyModal() {
+  document.getElementById('policyModal').classList.add('active');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+// Close modal on overlay click
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) {
+      overlay.classList.remove('active');
+    }
+  });
+});
+
+// Filter chips
+document.querySelectorAll('.filter-chip').forEach(chip => {
+  chip.addEventListener('click', () => {
+    const parent = chip.parentElement;
+    parent.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+    chip.classList.add('active');
+  });
+});
+
+// ESC to close modals
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') {
+    document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active'));
+  }
+});
+</script>
+
+</body>
+</html>

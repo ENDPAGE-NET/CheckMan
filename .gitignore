@@ -1,0 +1,72 @@
+# ===== OS =====
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# ===== IDE =====
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ===== Python / Backend =====
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+*.egg
+.pytest_cache/
+htmlcov/
+.coverage
+*.db
+*.sqlite3
+
+# ===== Node / Web Frontend =====
+node_modules/
+frontend/web/dist/
+
+# ===== Flutter / Mobile =====
+frontend/app/.dart_tool/
+frontend/app/.packages
+frontend/app/.flutter-plugins
+frontend/app/.flutter-plugins-dependencies
+frontend/app/.metadata
+frontend/app/build/
+frontend/app/android/.gradle/
+frontend/app/android/local.properties
+frontend/app/android/*.iml
+frontend/app/*.iml
+frontend/app/ios/Pods/
+frontend/app/ios/.symlinks/
+frontend/app/ios/Podfile.lock
+frontend/app/ios/Flutter/Generated.xcconfig
+frontend/app/ios/Flutter/flutter_export_environment.sh
+frontend/app/ios/Flutter/ephemeral/
+frontend/app/ios/Runner.xcworkspace/xcuserdata/
+frontend/app/macos/Pods/
+frontend/app/macos/Podfile.lock
+frontend/app/macos/Flutter/ephemeral/
+frontend/app/pubspec.lock
+
+# ===== Face Data (runtime generated) =====
+backend/face_data/
+
+# ===== Environment & Secrets =====
+.env
+.env.*
+!.env.example
+
+# ===== Docker =====
+*.log
+
+# ===== Playwright MCP =====
+.playwright-mcp/
+
+# ===== Claude Code =====
+.claude/
+.superpowers/

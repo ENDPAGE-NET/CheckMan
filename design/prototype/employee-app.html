@@ -1,0 +1,675 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CheckMan - 员工端</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --primary: #556257;
+  --primary-dim: #485549;
+  --primary-container: #d7e6d8;
+  --primary-container-light: #e8f0e8;
+  --on-primary: #ffffff;
+  --on-primary-container: #3a4a3c;
+  --surface: #f8faf8;
+  --surface-lowest: #ffffff;
+  --surface-low: #f1f4f2;
+  --surface-container: #eaefec;
+  --surface-high: #dfe5e1;
+  --surface-highest: #d4dbd6;
+  --on-surface: #2d3432;
+  --on-surface-var: #59615f;
+  --on-surface-muted: #8a918e;
+  --error: #ba1a1a;
+  --error-container: #ffdad6;
+  --warning: #8b6e00;
+  --warning-container: #ffeea0;
+  --outline-ghost: rgba(85,98,87,0.08);
+  --font-d: 'Plus Jakarta Sans', sans-serif;
+  --font-b: 'Manrope', sans-serif;
+  --r-sm: 0.5rem; --r-md: 1rem; --r-lg: 1.5rem; --r-xl: 2rem; --r-2xl: 3rem; --r-full: 9999px;
+  --shadow: 0 8px 32px rgba(45,52,50,0.06);
+  --ease: cubic-bezier(0.16,1,0.3,1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px;-webkit-font-smoothing:antialiased}
+body{font-family:var(--font-b);background:#2d3432;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:20px;color:var(--on-surface)}
+
+/* Phone */
+.phone{width:393px;height:852px;background:var(--surface);border-radius:48px;overflow:hidden;position:relative;box-shadow:0 0 0 8px #1c1f1d,0 0 0 10px #3a3f3b,0 30px 100px rgba(0,0,0,.5)}
+.dyn-island{position:absolute;top:12px;left:50%;transform:translateX(-50%);width:120px;height:34px;background:#1c1f1d;border-radius:20px;z-index:60}
+.home-bar{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);width:134px;height:5px;background:var(--on-surface);border-radius:3px;opacity:.15;z-index:60}
+.home-bar.light{background:#fff;opacity:.3}
+
+/* Screens */
+.s{position:absolute;inset:0;display:none;flex-direction:column;overflow:hidden;background:var(--surface)}
+.s.on{display:flex}
+.s-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.s-body::-webkit-scrollbar{display:none}
+
+/* iOS Bar */
+.bar{height:54px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 32px 8px;font-family:var(--font-d);font-weight:700;font-size:.82rem;color:var(--on-surface);position:relative;z-index:50}
+.bar.dark{color:#fff}
+
+/* SVG Icons (consistent 24x24, 1.5px stroke) */
+svg.ico{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.5;stroke-linecap:round;stroke-linejoin:round}
+svg.ico-lg{width:28px;height:28px}
+svg.ico-sm{width:18px;height:18px}
+
+/* Tab Bar */
+.tabs{position:absolute;bottom:0;left:0;right:0;height:84px;background:rgba(248,250,248,.88);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);display:flex;align-items:flex-start;justify-content:space-around;padding-top:10px;z-index:40}
+.tab{display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;padding:8px 22px;border-radius:var(--r-full);transition:all .2s ease}
+.tab svg{color:var(--on-surface-muted);transition:color .2s ease}
+.tab span{font-family:var(--font-b);font-size:.62rem;font-weight:700;color:var(--on-surface-muted);transition:color .2s ease}
+.tab.on{background:var(--primary-container)}
+.tab.on svg{color:var(--primary)}
+.tab.on span{color:var(--primary)}
+
+/* Nav Header */
+.nav-h{display:flex;align-items:center;padding:60px 24px 12px;gap:14px}
+.nav-bk{width:42px;height:42px;background:var(--surface-low);border:none;border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--on-surface)}
+.nav-bk:hover{background:var(--surface-container)}
+.nav-t{font-family:var(--font-d);font-size:1rem;font-weight:700}
+
+/* Buttons */
+.btn-p{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:18px 28px;background:linear-gradient(135deg,var(--primary),var(--primary-dim));color:var(--on-primary);border:none;border-radius:var(--r-full);font-family:var(--font-d);font-size:.95rem;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(85,98,87,.12);transition:all .25s var(--ease)}
+.btn-p:active{transform:scale(.98)}
+.btn-s{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:16px 24px;background:var(--surface-highest);color:var(--on-surface);border:none;border-radius:var(--r-full);font-family:var(--font-d);font-size:.9rem;font-weight:600;cursor:pointer}
+
+/* Fields */
+.fld{margin-bottom:14px}
+.fld-lbl{font-size:.72rem;font-weight:700;color:var(--on-surface-var);margin-bottom:8px;display:block}
+.fld-in{width:100%;padding:16px 20px;background:var(--surface-low);border:2px solid transparent;border-radius:var(--r-lg);font-family:var(--font-b);font-size:.95rem;color:var(--on-surface);outline:none;transition:all .3s var(--ease)}
+.fld-in::placeholder{color:var(--on-surface-muted)}
+.fld-in:focus{background:var(--surface-lowest);border-color:var(--outline-ghost);box-shadow:0 0 0 4px rgba(85,98,87,.06)}
+.fld-wrap{position:relative}
+.fld-wrap .fld-in{padding-right:48px}
+.fld-ico{position:absolute;right:16px;top:50%;transform:translateY(-50%);color:var(--on-surface-muted)}
+
+/* Chips */
+.chip{display:inline-flex;align-items:center;gap:5px;padding:5px 12px;border-radius:var(--r-full);font-size:.72rem;font-weight:700}
+.chip-ok{background:var(--primary-container);color:var(--on-primary-container)}
+.chip-warn{background:var(--warning-container);color:#6a5400}
+.chip-err{background:var(--error-container);color:#93000a}
+.chip-dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.chip-blink{animation:blink 1.8s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+
+/* Cards (no borders!) */
+.card{background:var(--surface-lowest);border-radius:var(--r-xl);padding:20px}
+.card-t{background:var(--surface-low);border-radius:var(--r-xl);padding:20px}
+.card-hero{background:var(--primary);border-radius:var(--r-2xl);padding:28px;color:var(--on-primary);position:relative;overflow:hidden}
+.card-hero::before{content:'';position:absolute;top:-50%;right:-25%;width:200px;height:200px;background:radial-gradient(circle,var(--primary-container) 0%,transparent 65%);opacity:.12}
+
+/* Animations */
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scaleIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+@keyframes slideR{from{transform:translateX(100%)}to{transform:translateX(0)}}
+@keyframes breathe{0%,100%{transform:scale(1);opacity:.3}50%{transform:scale(1.06);opacity:.6}}
+@keyframes sweep{0%{top:22%;opacity:0}15%{opacity:1}85%{opacity:1}100%{top:76%;opacity:0}}
+@keyframes pop{0%{transform:scale(0) rotate(-8deg)}60%{transform:scale(1.12) rotate(2deg)}100%{transform:scale(1) rotate(0)}}
+.s.sl{animation:slideR .4s var(--ease)}
+.au>*{animation:fadeUp .45s var(--ease) both}
+.au>*:nth-child(1){animation-delay:.04s}.au>*:nth-child(2){animation-delay:.08s}.au>*:nth-child(3){animation-delay:.12s}.au>*:nth-child(4){animation-delay:.16s}.au>*:nth-child(5){animation-delay:.2s}.au>*:nth-child(6){animation-delay:.24s}.au>*:nth-child(7){animation-delay:.28s}.au>*:nth-child(8){animation-delay:.32s}
+
+/* Demo Nav */
+.dn{position:fixed;top:50%;right:18px;transform:translateY(-50%);display:flex;flex-direction:column;gap:5px;z-index:9999}
+.dd{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.18);cursor:pointer;transition:all .15s ease;position:relative}
+.dd:hover{background:rgba(255,255,255,.5);transform:scale(1.5)}
+.dd.on{background:var(--primary-container);width:7px;height:20px;border-radius:3px}
+.dd .tp{position:absolute;right:16px;top:50%;transform:translateY(-50%);background:rgba(45,52,50,.9);color:#fff;padding:3px 8px;border-radius:5px;font-family:var(--font-d);font-size:.62rem;font-weight:600;white-space:nowrap;opacity:0;pointer-events:none;transition:opacity .12s ease}
+.dd:hover .tp{opacity:1}
+
+/* ===== PAGE STYLES ===== */
+
+/* LOGIN */
+.s-login{background:radial-gradient(ellipse 65% 45% at 50% 100%,var(--primary-container-light),transparent 70%),var(--surface)}
+.login-c{padding:90px 32px 0;text-align:center}
+.login-leaf{width:52px;height:52px;background:var(--primary-container);border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;margin:0 auto 22px}
+.login-c h1{font-family:var(--font-d);font-size:1.6rem;font-weight:800;letter-spacing:-.02em}
+.login-c p{color:var(--on-surface-var);font-size:.85rem;margin-top:6px}
+.login-form{padding:32px 32px 0}
+.login-ft{padding:20px 32px;text-align:center}
+.login-ft a{color:var(--primary);font-family:var(--font-d);font-weight:700;font-size:.85rem;text-decoration:none}
+.login-legal{text-align:center;margin-top:auto;padding-bottom:40px}
+.login-legal span{font-size:.68rem;color:var(--on-surface-muted)}
+
+/* PENDING */
+.s-pend{background:radial-gradient(ellipse 80% 45% at 50% 75%,rgba(255,238,160,.18),transparent),var(--surface);justify-content:center;align-items:center;text-align:center;padding:60px 44px 80px}
+.pend-ring{width:130px;height:130px;border-radius:50%;background:var(--warning-container);display:flex;align-items:center;justify-content:center;margin-bottom:28px;position:relative}
+.pend-ring::after{content:'';position:absolute;inset:-10px;border-radius:50%;border:2px dashed #c4a83a;opacity:.2;animation:breathe 3.5s ease-in-out infinite}
+.s-pend h2{font-family:var(--font-d);font-size:1.6rem;font-weight:800;margin-bottom:8px}
+.s-pend .pt{color:var(--on-surface-var);font-size:.85rem;line-height:1.7;max-width:250px}
+
+/* REJECTED */
+.s-rej{background:radial-gradient(ellipse 80% 45% at 50% 75%,rgba(255,218,214,.2),transparent),var(--surface);justify-content:center;align-items:center;text-align:center;padding:60px 44px 80px}
+.rej-ring{width:130px;height:130px;border-radius:50%;background:var(--error-container);display:flex;align-items:center;justify-content:center;margin-bottom:28px}
+.s-rej h2{font-family:var(--font-d);font-size:1.6rem;font-weight:800;margin-bottom:8px}
+.s-rej .rt{color:var(--on-surface-var);font-size:.85rem;line-height:1.7;max-width:250px;margin-bottom:24px}
+
+/* HOME */
+.hm-top{display:flex;align-items:center;justify-content:space-between;padding:60px 24px 8px}
+.hm-brand{display:flex;align-items:center;gap:10px}
+.hm-brand svg{color:var(--primary)}
+.hm-brand span{font-family:var(--font-d);font-size:.95rem;font-weight:800}
+.hm-ava{width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,var(--primary-container),var(--surface-high));display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-weight:800;font-size:.9rem;color:var(--primary);cursor:pointer}
+.hm-greet{padding:8px 24px 12px}
+.hm-greet p{font-size:.72rem;color:var(--on-surface-muted);font-weight:600}
+.hm-greet h2{font-family:var(--font-d);font-size:1.8rem;font-weight:800;letter-spacing:-.02em}
+
+/* Hero */
+.hero{margin:4px 24px 20px}
+.hero .h-label{font-size:.75rem;font-weight:600;color:rgba(255,255,255,.45)}
+.hero .h-time{font-family:var(--font-d);font-size:4rem;font-weight:800;color:#fff;letter-spacing:-.04em;line-height:1;margin:2px 0}
+.hero .h-sub{font-size:.75rem;color:rgba(255,255,255,.4);margin-bottom:20px}
+.hero .h-chip{display:inline-flex;align-items:center;gap:5px;padding:4px 11px;background:rgba(215,230,216,.18);border-radius:var(--r-full);color:var(--primary-container);font-size:.68rem;font-weight:700;position:absolute;top:28px;right:28px;z-index:1}
+.hero .h-chip-dot{width:5px;height:5px;background:var(--primary-container);border-radius:50%}
+.hero-btn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:16px;background:var(--surface-lowest);border:none;border-radius:var(--r-full);font-family:var(--font-d);font-size:.92rem;font-weight:700;color:var(--on-surface);cursor:pointer;position:relative;z-index:1;box-shadow:var(--shadow);transition:all .2s ease}
+.hero-btn:active{transform:scale(.97)}
+
+/* Today Status */
+.today-card{margin:0 24px 16px;background:var(--surface-lowest);border-radius:var(--r-xl);padding:20px}
+.tc-row{display:flex;align-items:center;justify-content:space-between;padding:12px 0}
+.tc-row:first-child{padding-top:0}
+.tc-row+.tc-row{border-top:none}
+.tc-left{display:flex;align-items:center;gap:12px}
+.tc-left svg{color:var(--on-surface-muted)}
+.tc-label{font-size:.78rem;color:var(--on-surface-var)}
+.tc-val{font-family:var(--font-d);font-size:1.1rem;font-weight:800;color:var(--on-surface)}
+.tc-tags{display:flex;gap:6px;padding:12px 0 0}
+.tc-tag{font-size:.62rem;padding:4px 10px;border-radius:var(--r-full);font-weight:700;background:var(--primary-container);color:var(--on-primary-container)}
+
+/* CHECKIN */
+.s-cam{background:var(--primary-dim)}
+.cam-c{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 40px 40px;position:relative}
+.cam-bk{position:absolute;top:62px;left:24px;width:42px;height:42px;background:rgba(255,255,255,.08);backdrop-filter:blur(8px);border:none;border-radius:var(--r-md);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:5}
+.cam-title{color:#fff;font-family:var(--font-d);font-size:1.4rem;font-weight:800;margin-bottom:6px}
+.cam-desc{color:rgba(255,255,255,.45);font-size:.8rem;text-align:center;margin-bottom:28px}
+.vf{width:210px;height:210px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.04),rgba(0,0,0,.25));position:relative;margin-bottom:28px}
+.vf-ring{position:absolute;inset:14px;border-radius:50%;border:1.5px solid rgba(255,255,255,.1)}
+.vf-h,.vf-v{position:absolute;background:rgba(255,255,255,.05)}
+.vf-h{left:18%;right:18%;top:50%;height:1px}
+.vf-v{top:18%;bottom:18%;left:50%;width:1px}
+.vf-scan{position:absolute;left:14px;right:14px;height:2px;background:linear-gradient(90deg,transparent,rgba(215,230,216,.7),transparent);animation:sweep 2.8s ease-in-out infinite}
+.vf-c{position:absolute;width:18px;height:18px;border-style:solid;border-color:rgba(255,255,255,.45);border-width:0}
+.vf-c.tl{top:6px;left:6px;border-top-width:2px;border-left-width:2px;border-radius:3px 0 0 0}
+.vf-c.tr{top:6px;right:6px;border-top-width:2px;border-right-width:2px;border-radius:0 3px 0 0}
+.vf-c.bl{bottom:6px;left:6px;border-bottom-width:2px;border-left-width:2px;border-radius:0 0 0 3px}
+.vf-c.br{bottom:6px;right:6px;border-bottom-width:2px;border-right-width:2px;border-radius:0 0 3px 0}
+.gps-p{display:inline-flex;align-items:center;gap:7px;padding:9px 18px;background:rgba(215,230,216,.12);backdrop-filter:blur(8px);border-radius:var(--r-full);color:var(--primary-container);font-size:.72rem;font-weight:700;margin-bottom:28px}
+.gps-dot{width:7px;height:7px;background:var(--primary-container);border-radius:50%;animation:blink 1.5s ease-in-out infinite}
+.shutter{width:66px;height:66px;border-radius:50%;background:var(--surface-lowest);border:4px solid rgba(255,255,255,.25);cursor:pointer;position:relative;box-shadow:0 4px 20px rgba(0,0,0,.25);transition:all .15s ease}
+.shutter::after{content:'';position:absolute;inset:5px;background:var(--primary-container);border-radius:50%}
+.shutter:active{transform:scale(.88)}
+
+/* SUCCESS */
+.s-ok{background:radial-gradient(ellipse 65% 40% at 50% 65%,var(--primary-container-light),transparent),var(--surface);justify-content:center;align-items:center;text-align:center;padding:60px 40px}
+.ok-mark{width:100px;height:100px;border-radius:50%;background:var(--primary-container);display:flex;align-items:center;justify-content:center;margin-bottom:24px;animation:pop .5s cubic-bezier(.34,1.56,.64,1)}
+.ok-mark svg{color:var(--primary);width:44px;height:44px}
+.s-ok h2{font-family:var(--font-d);font-size:1.4rem;font-weight:800;margin-bottom:4px}
+.ok-time{font-family:var(--font-d);font-size:3rem;font-weight:800;color:var(--primary);letter-spacing:-.03em;margin-bottom:4px}
+.s-ok .om{color:var(--on-surface-var);font-size:.85rem;margin-bottom:24px}
+.ok-chips{display:flex;gap:8px;margin-bottom:36px}
+
+/* HISTORY */
+.hist-hero{margin:8px 24px 16px;background:var(--primary-container);border-radius:var(--r-2xl);padding:22px}
+.hh-p{font-size:.72rem;color:var(--on-primary-container);font-weight:600;opacity:.55;margin-bottom:2px}
+.hh-v{font-family:var(--font-d);font-size:3rem;font-weight:800;color:var(--on-primary-container);letter-spacing:-.04em;line-height:1}
+.hh-u{font-size:1.1rem;font-weight:500;opacity:.45;margin-left:3px}
+.hh-l{font-size:.75rem;color:var(--on-primary-container);opacity:.45;margin-top:3px}
+.hh-bar{height:5px;background:rgba(58,74,60,.12);border-radius:var(--r-full);margin-top:14px;overflow:hidden}
+.hh-fill{height:100%;width:78%;background:var(--primary);border-radius:var(--r-full)}
+
+.hist-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 24px;margin-bottom:16px}
+.hist-stat{background:var(--surface-lowest);border-radius:var(--r-xl);padding:16px}
+.hs-ico{margin-bottom:8px;color:var(--on-surface-muted)}
+.hs-v{font-family:var(--font-d);font-size:1.4rem;font-weight:800}
+.hs-l{font-size:.65rem;color:var(--on-surface-muted);font-weight:600;text-transform:uppercase;letter-spacing:.04em}
+
+.day-pick{display:flex;gap:5px;padding:0 24px;margin-bottom:16px}
+.dp{flex:1;text-align:center;padding:10px 0;background:var(--surface-lowest);border-radius:var(--r-lg);cursor:pointer}
+.dp .d-w{font-size:.55rem;font-weight:700;color:var(--on-surface-muted);text-transform:uppercase}
+.dp .d-n{font-family:var(--font-d);font-size:1rem;font-weight:800;color:var(--on-surface);margin-top:1px}
+.dp.now{background:var(--primary)}
+.dp.now .d-w{color:rgba(255,255,255,.55)}
+.dp.now .d-n{color:#fff}
+
+.h-entries{padding:0 24px;margin-bottom:96px}
+.he{background:var(--surface-lowest);border-radius:var(--r-xl);padding:18px;margin-bottom:10px}
+.he-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:3px}
+.he-date{font-family:var(--font-d);font-size:.9rem;font-weight:800}
+.he-meta{font-size:.72rem;color:var(--on-surface-muted);margin-bottom:12px}
+.he-times{display:grid;grid-template-columns:1fr 1fr;gap:24px}
+.ht-lbl{display:flex;align-items:center;gap:5px;font-size:.65rem;color:var(--on-surface-muted);font-weight:600;margin-bottom:3px}
+.ht-val{font-family:var(--font-d);font-size:1.3rem;font-weight:800}
+.ht-val.late{color:var(--error)}
+
+/* PROFILE */
+.prof-head{display:flex;flex-direction:column;align-items:center;padding:70px 24px 20px}
+.prof-ava{width:80px;height:80px;border-radius:50%;background:linear-gradient(135deg,var(--primary-container),var(--surface-high));display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-weight:800;font-size:1.8rem;color:var(--primary);position:relative}
+.prof-badge{position:absolute;bottom:-2px;right:-2px}
+.prof-head h2{font-family:var(--font-d);font-size:1.4rem;font-weight:800;margin-top:12px}
+.prof-role{color:var(--on-surface-var);font-size:.8rem;margin-top:2px}
+.prof-stats{display:flex;gap:10px;margin-top:14px}
+.ps-pill{padding:10px 18px;background:var(--surface-low);border-radius:var(--r-full);text-align:center}
+.ps-l{font-size:.58rem;color:var(--on-surface-muted);font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.ps-v{font-family:var(--font-d);font-size:1rem;font-weight:800}
+
+.prof-sec{padding:0 24px;margin-bottom:18px}
+.prof-sec-t{font-size:.65rem;font-weight:700;color:var(--on-surface-muted);text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px}
+.prof-card{background:var(--surface-lowest);border-radius:var(--r-xl);overflow:hidden}
+.pi{display:flex;align-items:center;gap:14px;padding:16px 18px;cursor:pointer;transition:background .12s ease}
+.pi:hover{background:var(--surface-low)}
+.pi-ico{width:36px;height:36px;background:var(--surface-low);border-radius:var(--r-md);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--on-surface-var)}
+.pi-txt{flex:1}
+.pi-lbl{font-size:.68rem;color:var(--on-surface-muted)}
+.pi-val{font-family:var(--font-d);font-size:.85rem;font-weight:700}
+.pi-arr{color:var(--on-surface-muted)}
+.btn-logout{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;padding:16px;background:transparent;color:var(--error);border:none;border-radius:var(--r-full);font-family:var(--font-d);font-size:.88rem;font-weight:600;cursor:pointer}
+
+/* PASSWORD */
+.s-pwd{background:radial-gradient(ellipse 65% 38% at 50% 100%,var(--primary-container-light),transparent 70%),var(--surface)}
+.pwd-c{padding:8px 24px;flex:1}
+.pwd-c h2{font-family:var(--font-d);font-size:1.5rem;font-weight:800;margin-bottom:4px}
+.pwd-d{color:var(--on-surface-var);font-size:.82rem;margin-bottom:24px}
+.pwd-meter{display:flex;gap:4px;margin-top:8px}
+.pwd-meter .seg{height:4px;flex:1;background:var(--surface-high);border-radius:var(--r-full)}
+.pwd-meter .s1{background:#ba1a1a}.pwd-meter .s2{background:#8b6e00}.pwd-meter .s3{background:#7ba584}
+
+/* REGISTER */
+.reg-c{padding:0 24px}
+.reg-c h2{font-family:var(--font-d);font-size:1.5rem;font-weight:800;margin-bottom:4px}
+.reg-d{color:var(--on-surface-var);font-size:.82rem;margin-bottom:24px;line-height:1.5}
+.face-z{width:190px;height:190px;margin:0 auto 20px;border-radius:50%;background:var(--primary);position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;cursor:pointer;overflow:hidden}
+.face-z::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 30%,rgba(255,255,255,.08),transparent 60%)}
+.face-z .fz-ring{position:absolute;inset:-8px;border-radius:50%;border:2px solid var(--primary-container);animation:breathe 3s ease-in-out infinite}
+.face-z .fz-inner{position:absolute;inset:14px;border-radius:50%;border:1px solid rgba(255,255,255,.12)}
+.face-z span{color:rgba(255,255,255,.85);font-family:var(--font-d);font-weight:700;font-size:.82rem;position:relative;z-index:1}
+.face-z .fz-sub{color:rgba(255,255,255,.4);font-size:.7rem;font-weight:500}
+.steps{display:flex;gap:6px;padding:0 24px;margin-bottom:22px}
+.step{height:3px;flex:1;background:var(--surface-high);border-radius:var(--r-full)}
+.step.done{background:var(--primary)}
+.step.now{background:var(--primary-container)}
+.reg-bot{padding:0 24px 32px}
+</style>
+</head>
+<body>
+
+<div class="dn">
+  <div class="dd on" data-s="login"><div class="tp">登录</div></div>
+  <div class="dd" data-s="register"><div class="tp">注册</div></div>
+  <div class="dd" data-s="pending"><div class="tp">待审核</div></div>
+  <div class="dd" data-s="rejected"><div class="tp">已拒绝</div></div>
+  <div class="dd" data-s="home"><div class="tp">主页</div></div>
+  <div class="dd" data-s="checkin"><div class="tp">打卡</div></div>
+  <div class="dd" data-s="success"><div class="tp">成功</div></div>
+  <div class="dd" data-s="history"><div class="tp">历史</div></div>
+  <div class="dd" data-s="profile"><div class="tp">个人</div></div>
+  <div class="dd" data-s="changepwd"><div class="tp">改密码</div></div>
+</div>
+
+<div class="phone">
+<div class="dyn-island"></div>
+
+<!-- ===== LOGIN ===== -->
+<div class="s s-login on" id="s-login">
+  <div class="bar"><span>9:41</span><span style="font-size:.68rem">&#9679;&#9679;&#9679; 5G</span></div>
+  <div class="s-body">
+    <div class="login-c">
+      <div class="login-leaf">
+        <svg class="ico-lg" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg>
+      </div>
+      <h1>CheckMan</h1>
+      <p>欢迎使用 CheckMan，请登录。</p>
+    </div>
+    <form class="login-form" onsubmit="go('home');return false">
+      <div class="fld">
+        <span class="fld-lbl">工号</span>
+        <div class="fld-wrap">
+          <input class="fld-in" placeholder="输入您的工号" value="zhangsan">
+          <span class="fld-ico"><svg class="ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg></span>
+        </div>
+      </div>
+      <div class="fld">
+        <span class="fld-lbl">密码</span>
+        <div class="fld-wrap">
+          <input class="fld-in" type="password" placeholder="至少 8 个字符" value="pass1234">
+          <span class="fld-ico"><svg class="ico-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+        </div>
+      </div>
+      <div style="height:14px"></div>
+      <button type="submit" class="btn-p">登录 <svg class="ico-sm" viewBox="0 0 24 24" style="stroke:#fff"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button>
+    </form>
+    <div class="login-ft"><a href="#" onclick="go('register');return false">没有账号？立即注册</a></div>
+    <div class="login-legal"><span>安全环境</span></div>
+  </div>
+  <div class="home-bar"></div>
+</div>
+
+<!-- ===== REGISTER ===== -->
+<div class="s" id="s-register">
+  <div class="bar"><span>9:41</span><span style="font-size:.68rem">&#9679;&#9679;&#9679; 5G</span></div>
+  <div class="nav-h">
+    <button class="nav-bk" onclick="go('login')"><svg class="ico-sm" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+    <span class="nav-t">注册新账号</span>
+  </div>
+  <div class="steps"><div class="step done"></div><div class="step done"></div><div class="step now"></div></div>
+  <div class="s-body">
+    <div class="reg-c au">
+      <h2>人脸识别设置</h2>
+      <p class="reg-d">设置生物识别身份验证，实现更快速的打卡。</p>
+      <div class="face-z">
+        <div class="fz-ring"></div>
+        <div class="fz-inner"></div>
+        <svg class="ico-lg" viewBox="0 0 24 24" style="stroke:rgba(255,255,255,.7);position:relative;z-index:1"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="10" r="3"/><path d="M7 20c0-3 2-5 5-5s5 2 5 5"/></svg>
+        <span>点击拍摄</span>
+        <span class="fz-sub">确保光线充足</span>
+      </div>
+      <div class="fld"><span class="fld-lbl">姓名</span><input class="fld-in" value="王五" placeholder="真实姓名"></div>
+      <div class="fld"><span class="fld-lbl">用户名</span><input class="fld-in" value="wangwu" placeholder="登录用户名"></div>
+    </div>
+  </div>
+  <div class="reg-bot"><button class="btn-p" onclick="go('pending')">完成注册 <svg class="ico-sm" viewBox="0 0 24 24" style="stroke:#fff"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button></div>
+  <div class="home-bar"></div>
+</div>
+
+<!-- ===== PENDING ===== -->
+<div class="s s-pend" id="s-pending">
+  <div class="bar" style="position:absolute;top:0;left:0;right:0"><span>9:42</span><span style="font-size:.68rem">&#9679;&#9679;&#9679; 5G</span></div>
+  <div class="pend-ring"><svg viewBox="0 0 24 24" style="width:48px;height:48px;fill:none;stroke:#8b6e00;stroke-width:1.5;stroke-linecap:round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+  <h2>等待审核中</h2>
+  <p class="pt">您的注册申请已提交成功。管理员正在审核，通过后即可使用打卡功能。</p>
+  <div class="chip chip-warn" style="margin-top:22px"><span class="chip-dot chip-blink"></span>审核中</div>
+  <div class="home-bar"></div>
+</div>
+
+<!-- ===== REJECTED ===== -->
+<div class="s s-rej" id="s-rejected">
+  <div class="bar" style="position:absolute;top:0;left:0;right:0"><span>9:42</span><span style="font-size:.68rem">&#9679;&#9679;&#9679; 5G</span></div>
+  <div class="rej-ring"><svg viewBox="0 0 24 24" style="width:48px;height:48px;fill:none;stroke:#93000a;stroke-width:1.5;stroke-linecap:round"><circle cx="12" cy="12" r="10"/><path d="M15 9l-6 6M9 9l6 6"/></svg></div>
+  <h2>注册被拒绝</h2>
+  <p class="rt">抱歉，您的注册申请未通过审核。您可以修改信息后重新提交。</p>
+  <button class="btn-p" style="width:auto;padding:14px 36px" onclick="go('register')">重新注册</button>
+  <div class="home-bar"></div>
+</div>
+
+<!-- ===== HOME ===== -->
+<div class="s" id="s-home">
+  <div class="bar"><span>9:41</span><span style="font-size:.68rem">&#9679;&#9679;&#9679; 5G</span></div>
+  <div class="s-body">
+    <div class="hm-top">
+      <div class="hm-brand">
+        <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:var(--primary);stroke-width:2;stroke-linecap:round"><path d="M20 6L9 17l-5-5"/></svg>
+        <span>CheckMan</span>
+      </div>
+      <div class="hm-ava" onclick="go('profile')">张</div>
+    </div>
+    <div class="hm-greet">
+      <p>2026年3月29日 星期日</p>
+      <h2>下午好，张三</h2>
+    </div>
+
+    <div class="au">
+      <div class="hero card-hero" style="margin:4px 24px 20px">
+        <div class="h-chip"><span class="h-chip-dot"></span> 已签到</div>
+        <div class="h-label">今日进度</div>
+        <div class="h-time" id="heroT">14:35</div>
+        <div class="h-sub">今日已打卡时长</div>
+        <button class="hero-btn" onclick="go('checkin')">
+          <svg class="ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          签退
+        </button>
+      </div>
+
+      <div class="today-card">
+        <div style="font-family:var(--font-d);font-size:.88rem;font-weight:800;margin-bottom:12px">今日考勤状态</div>
+        <div class="tc-row">
+          <div class="tc-left">
+            <svg class="ico-sm" viewBox="0 0 24 24"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg>
+            <span class="tc-label">上班打卡</span>
+          </div>
+          <span class="tc-val">08:52</span>
+        </div>
+        <div class="tc-row">
+          <div class="tc-left">
+            <svg class="ico-sm" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M19.8 12H9"/></svg>
+            <span class="tc-label">下班打卡</span>
+          </div>
+          <span class="tc-val" style="color:var(--on-surface-muted)">--:--</span>
+        </div>
+        <div class="tc-tags">
+          <span class="tc-tag"><svg class="ico-sm" viewBox="0 0 24 24" style="width:12px;height:12px;margin-right:2px"><path d="M20 6L9 17l-5-5"/></svg> THROUGH</span>
+          <span class="tc-tag"><svg class="ico-sm" viewBox="0 0 24 24" style="width:12px;height:12px;margin-right:2px"><path d="M20 6L9 17l-5-5"/></svg> THROUGH</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 3 Tabs Only -->
+  <div class="tabs">
+    <div class="tab on" onclick="go('home')">
+      <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+      <span>打卡</span>
+    </div>
+    <div class="tab" onclick="go('history')">
+      <svg class="ico" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v4h4"/></svg>
+      <span>记录</span>
+    </div>
+    <div class="tab" onclick="go('profile')">
+      <svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg>
+      <span>个人</span>
+    </div>
+  </div>
+  <div class="home-bar"></div>
+</div>
+
+<!-- ===== CHECKIN ===== -->
+<div class="s s-cam" id="s-checkin">
+  <div class="bar dark"><span>9:41</span><span style="font-size:.68rem">&#9679;&#9679;&#9679; 5G</span></div>
+  <div class="cam-c">
+    <button class="cam-bk" onclick="go('home')"><svg class="ico-sm" viewBox="0 0 24 24" style="stroke:#fff"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+    <div class="cam-title">人脸识别验证</div>
+    <div class="cam-desc">请将面部置于圆框内，保持光线充足</div>
+    <div class="vf">
+      <div class="vf-ring"></div>
+      <div class="vf-h"></div><div class="vf-v"></div>
+      <div class="vf-scan"></div>
+      <div class="vf-c tl"></div><div class="vf-c tr"></div><div class="vf-c bl"></div><div class="vf-c br"></div>
+    </div>
+    <div class="gps-p"><span class="gps-dot"></span>GPS 已定位 · 31.2308°N, 121.4741°E</div>
+    <div class="shutter" onclick="go('success')"></div>
+  </div>
+  <div class="home-bar light"></div>
+</div>
+
+<!-- ===== SUCCESS ===== -->
+<div class="s s-ok" id="s-success">
+  <div class="bar" style="position:absolute;top:0;left:0;right:0"><span>18:05</span><span style="font-size:.68rem">&#9679;&#9679;&#9679; 5G</span></div>
+  <div class="ok-mark"><svg viewBox="0 0 24 24" style="fill:none;stroke:var(--primary);stroke-width:2.5;stroke-linecap:round"><path d="M20 6L9 17l-5-5"/></svg></div>
+  <h2>签退成功</h2>
+  <div class="ok-time">18:05</div>
+  <p class="om">工作辛苦了，明天见！</p>
+  <div class="ok-chips">
+    <span class="chip chip-ok"><span class="chip-dot"></span>人脸通过</span>
+    <span class="chip chip-ok"><span class="chip-dot"></span>地点通过</span>
+  </div>
+  <button class="btn-p" style="width:auto;padding:14px 44px" onclick="go('home')">返回首页</button>
+  <div class="home-bar"></div>
+</div>
+
+<!-- ===== HISTORY ===== -->
+<div class="s" id="s-history">
+  <div class="bar"><span>9:41</span><span style="font-size:.68rem">&#9679;&#9679;&#9679; 5G</span></div>
+  <div class="nav-h">
+    <div class="hm-brand">
+      <svg viewBox="0 0 24 24" style="width:22px;height:22px;fill:none;stroke:var(--primary);stroke-width:2;stroke-linecap:round"><path d="M20 6L9 17l-5-5"/></svg>
+      <span style="font-family:var(--font-d);font-size:.95rem;font-weight:800">CheckMan</span>
+    </div>
+  </div>
+  <div class="s-body">
+    <div class="au">
+      <div class="hist-hero">
+        <div class="hh-p">2026年3月</div>
+        <div class="hh-v">168.5<span class="hh-u">/ 小时</span></div>
+        <div class="hh-l">本月总工时</div>
+        <div class="hh-bar"><div class="hh-fill"></div></div>
+      </div>
+      <div class="hist-row">
+        <div class="hist-stat">
+          <div class="hs-ico"><svg class="ico-sm" viewBox="0 0 24 24"><path d="M18 20V10M12 20V4M6 20v-6"/></svg></div>
+          <div class="hs-v">8.2h</div>
+          <div class="hs-l">平均工时</div>
+        </div>
+        <div class="hist-stat">
+          <div class="hs-ico"><svg class="ico-sm" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/><path d="M9 16l2 2 4-4"/></svg></div>
+          <div class="hs-v">22</div>
+          <div class="hs-l">出勤天数</div>
+        </div>
+      </div>
+      <div style="padding:0 24px;margin-bottom:10px"><span style="font-family:var(--font-d);font-size:1rem;font-weight:800">历史记录</span></div>
+      <div class="day-pick">
+        <div class="dp"><div class="d-w">Mon</div><div class="d-n">24</div></div>
+        <div class="dp"><div class="d-w">Tue</div><div class="d-n">25</div></div>
+        <div class="dp now"><div class="d-w">Wed</div><div class="d-n">26</div></div>
+        <div class="dp"><div class="d-w">Thu</div><div class="d-n">27</div></div>
+        <div class="dp"><div class="d-w">Fri</div><div class="d-n">28</div></div>
+      </div>
+      <div class="h-entries">
+        <div class="he">
+          <div class="he-top"><span class="he-date">3月26日</span><span class="chip chip-ok" style="font-size:.6rem;padding:3px 9px">正常</span></div>
+          <div class="he-meta">周三 · 工时 9.5h</div>
+          <div class="he-times">
+            <div><div class="ht-lbl"><svg class="ico-sm" viewBox="0 0 24 24" style="width:11px;height:11px"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg> 签到</div><div class="ht-val">08:52</div></div>
+            <div><div class="ht-lbl"><svg class="ico-sm" viewBox="0 0 24 24" style="width:11px;height:11px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M19.8 12H9"/></svg> 签退</div><div class="ht-val">18:30</div></div>
+          </div>
+        </div>
+        <div class="he">
+          <div class="he-top"><span class="he-date">3月25日</span><span class="chip chip-err" style="font-size:.6rem;padding:3px 9px">迟到</span></div>
+          <div class="he-meta">周二 · 工时 8.0h</div>
+          <div class="he-times">
+            <div><div class="ht-lbl"><svg class="ico-sm" viewBox="0 0 24 24" style="width:11px;height:11px"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg> 签到</div><div class="ht-val late">09:15</div></div>
+            <div><div class="ht-lbl"><svg class="ico-sm" viewBox="0 0 24 24" style="width:11px;height:11px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M19.8 12H9"/></svg> 签退</div><div class="ht-val">18:15</div></div>
+          </div>
+        </div>
+        <div class="he">
+          <div class="he-top"><span class="he-date">3月24日</span><span class="chip chip-ok" style="font-size:.6rem;padding:3px 9px">正常</span></div>
+          <div class="he-meta">周一 · 工时 8.8h</div>
+          <div class="he-times">
+            <div><div class="ht-lbl"><svg class="ico-sm" viewBox="0 0 24 24" style="width:11px;height:11px"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4M10 17l5-5-5-5M13.8 12H3"/></svg> 签到</div><div class="ht-val">09:00</div></div>
+            <div><div class="ht-lbl"><svg class="ico-sm" viewBox="0 0 24 24" style="width:11px;height:11px"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M19.8 12H9"/></svg> 签退</div><div class="ht-val">17:48</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab" onclick="go('home')"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>打卡</span></div>
+    <div class="tab on" onclick="go('history')"><svg class="ico" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v4h4"/></svg><span>记录</span></div>
+    <div class="tab" onclick="go('profile')"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg><span>个人</span></div>
+  </div>
+  <div class="home-bar"></div>
+</div>
+
+<!-- ===== PROFILE ===== -->
+<div class="s" id="s-profile">
+  <div class="bar"><span>9:41</span><span style="font-size:.68rem">&#9679;&#9679;&#9679; 5G</span></div>
+  <div class="s-body">
+    <div class="au">
+      <div class="prof-head">
+        <div class="prof-ava">张
+          <div class="prof-badge"><span class="chip chip-ok" style="font-size:.55rem;padding:2px 7px">已激活</span></div>
+        </div>
+        <h2>张三</h2>
+        <div class="prof-role">前端工程师</div>
+        <div class="prof-stats">
+          <div class="ps-pill"><div class="ps-l">本月工时</div><div class="ps-v">164.5h</div></div>
+          <div class="ps-pill"><div class="ps-l">打卡成功率</div><div class="ps-v">98%</div></div>
+        </div>
+      </div>
+      <div class="prof-sec">
+        <div class="prof-sec-t">账户详情</div>
+        <div class="prof-card">
+          <div class="pi">
+            <div class="pi-ico"><svg class="ico-sm" viewBox="0 0 24 24"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 8h20"/></svg></div>
+            <div class="pi-txt"><div class="pi-lbl">工号</div><div class="pi-val">EP-2026-0312</div></div>
+          </div>
+          <div class="pi">
+            <div class="pi-ico"><svg class="ico-sm" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg></div>
+            <div class="pi-txt"><div class="pi-lbl">打卡策略</div><div class="pi-val">办公室考勤</div></div>
+          </div>
+          <div class="pi">
+            <div class="pi-ico"><svg class="ico-sm" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="10" r="3"/><path d="M7 20c0-3 2-5 5-5s5 2 5 5"/></svg></div>
+            <div class="pi-txt"><div class="pi-lbl">人脸状态</div><div class="pi-val">已录入</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="prof-sec">
+        <div class="prof-sec-t">系统设置</div>
+        <div class="prof-card">
+          <div class="pi" onclick="go('register')">
+            <div class="pi-ico"><svg class="ico-sm" viewBox="0 0 24 24"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+            <div class="pi-txt"><div class="pi-val">人脸重录</div></div>
+            <span class="pi-arr"><svg class="ico-sm" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
+          </div>
+          <div class="pi" onclick="go('changepwd')">
+            <div class="pi-ico"><svg class="ico-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+            <div class="pi-txt"><div class="pi-val">修改密码</div></div>
+            <span class="pi-arr"><svg class="ico-sm" viewBox="0 0 24 24"><path d="M9 18l6-6-6-6"/></svg></span>
+          </div>
+        </div>
+      </div>
+      <div style="padding:0 24px 16px">
+        <button class="btn-logout" onclick="go('login')">
+          <svg class="ico-sm" viewBox="0 0 24 24" style="stroke:var(--error)"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M19.8 12H9"/></svg>
+          退出登录
+        </button>
+      </div>
+      <div style="text-align:center;padding-bottom:100px"><span style="font-size:.65rem;color:var(--on-surface-muted)">V2.4.0 (ENTERPRISE EDITION)</span></div>
+    </div>
+  </div>
+  <div class="tabs">
+    <div class="tab" onclick="go('home')"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg><span>打卡</span></div>
+    <div class="tab" onclick="go('history')"><svg class="ico" viewBox="0 0 24 24"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="10"/><path d="M3.05 11a9 9 0 1 1 .5 4m-.5-4v4h4"/></svg><span>记录</span></div>
+    <div class="tab on" onclick="go('profile')"><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M20 21a8 8 0 1 0-16 0"/></svg><span>个人</span></div>
+  </div>
+  <div class="home-bar"></div>
+</div>
+
+<!-- ===== CHANGE PASSWORD ===== -->
+<div class="s s-pwd" id="s-changepwd">
+  <div class="bar"><span>9:42</span><span style="font-size:.68rem">&#9679;&#9679;&#9679; 5G</span></div>
+  <div class="nav-h">
+    <button class="nav-bk" onclick="go('profile')"><svg class="ico-sm" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+    <span class="nav-t">修改密码</span>
+  </div>
+  <div class="s-body">
+    <div class="pwd-c au">
+      <h2>设置新密码</h2>
+      <p class="pwd-d">管理员已重置您的密码，请设置新密码后继续使用。</p>
+      <div class="fld"><span class="fld-lbl">当前密码</span><div class="fld-wrap"><input class="fld-in" type="password" placeholder="输入临时密码" value="temp1234"><span class="fld-ico"><svg class="ico-sm" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span></div></div>
+      <div class="fld"><span class="fld-lbl">新密码</span><div class="fld-wrap"><input class="fld-in" type="password" placeholder="至少 8 位字符" value="newpass88"><span class="fld-ico"><svg class="ico-sm" viewBox="0 0 24 24"><circle cx="12" cy="16" r="1"/><path d="M12 11v2"/><path d="M5 6a7 7 0 0 1 14 0c0 2.5-1 4-3 6H8C6 10 5 8.5 5 6z"/></svg></span></div><div class="pwd-meter"><div class="seg s1"></div><div class="seg s2"></div><div class="seg s3"></div><div class="seg"></div></div></div>
+      <div class="fld"><span class="fld-lbl">确认密码</span><div class="fld-wrap"><input class="fld-in" type="password" placeholder="再次输入新密码" value="newpass88"><span class="fld-ico"><svg class="ico-sm" viewBox="0 0 24 24"><path d="M20 6L9 17l-5-5"/></svg></span></div></div>
+    </div>
+  </div>
+  <div style="padding:0 24px 32px"><button class="btn-p" onclick="go('home')">确认修改 <svg class="ico-sm" viewBox="0 0 24 24" style="stroke:#fff"><path d="M5 12h14M12 5l7 7-7 7"/></svg></button></div>
+  <div class="home-bar"></div>
+</div>
+
+</div>
+
+<script>
+function go(n){
+  document.querySelectorAll('.s').forEach(s=>s.classList.remove('on','sl'));
+  const t=document.getElementById('s-'+n);
+  if(t){t.classList.add('on','sl')}
+  document.querySelectorAll('.dd').forEach(d=>d.classList.remove('on'));
+  const d=document.querySelector(`.dd[data-s="${n}"]`);
+  if(d)d.classList.add('on');
+}
+document.querySelectorAll('.dd').forEach(d=>d.addEventListener('click',()=>go(d.dataset.s)));
+</script>
+</body>
+</html>
