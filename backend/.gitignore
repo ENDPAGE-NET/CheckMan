@@ -1,0 +1,7 @@
+__pycache__/
+*.pyc
+*.pyo
+face_data/*.pkl
+*.db
+.env
+.venv/
